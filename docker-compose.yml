@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # PHP service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_app
+    restart: unless-stopped
+    working_dir: /var/www
+    healthcheck:
+      test: ["CMD", "php-fpm", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - docker-test
+    user: appuser
+
+  # Nginx service
+  webserver:
+    #image: nginx:alpine
+    build:
+        context: ./nginx
+        dockerfile: Dockerfile
+    container_name: laravel_webserver
+    restart: unless-stopped
+    ports:
+      - "8016:8080"
+    #volumes:
+        #- ./nginx/conf.d:/etc/nginx/conf.d
+    #depends_on:
+        #app:
+        #condition: service_healthy
+    networks:
+      - docker-test
+    user: nginxuser
+
+# Networks
+networks:
+  docker-test:
+    driver: bridge
