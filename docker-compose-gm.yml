@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: laravel_app
+    container_name: govi_m_app
     restart: unless-stopped
     working_dir: /var/www
     healthcheck:
@@ -15,7 +15,9 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - docker-test
+      - govi-m
+    volumes:
+      - app-data:/var/www
     user: appuser
 
   # Nginx service
@@ -23,18 +25,23 @@ services:
     build:
         context: ./nginx
         dockerfile: Dockerfile
-    container_name: laravel_webserver
+    container_name: govi_m_webserver
     restart: unless-stopped
     ports:
-      - "8016:8080"
-    depends_on:
-      app:
-        condition: service_healthy
+      - "8017:8080"
+   #depends_on:
+     #app:
+       #condition: service_healthy
     networks:
-      - docker-test
+      - govi-m
+    volumes:
+      - app-data:/var/www:ro
     user: nginxuser
 
 # Networks
 networks:
-  docker-test:
+  govi-m:
     driver: bridge
+
+volumes:
+  app-data:
